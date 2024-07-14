@@ -30,10 +30,17 @@
           map.setZoom(16);
         });
       }
+
+      const apiKey = prompt("請輸入你的密碼");
+
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
+      script.async = true;
+      document.body.appendChild(script);
     </script>
     <script
       async
-      src="https://maps.googleapis.com/maps/api/js?key=You-Key=async&libraries=places&callback=initMap"
+      src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"
     ></script>
   </body>
 </html>
