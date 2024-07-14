@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>午餐吃什麼?</title>
+  </head>
+  <body style="margin: 0">
+    <div style="display: flex">
+      <div id="map" style="width: 50%; height: 100vh"></div>
+      <div></div>
+    </div>
+    <script>
+      let map;
+      let currentPosition;
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 23.9037, lng: 121.0794 },
+          zoom: 7,
+        });
+
+        navigator.geolocation.getCurrentPosition(function (position) {
+          currentPosition = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+
+          map.setCenter(currentPosition);
+          map.SetZoom(16);
+        });
+      }
+    </script>
+    <script
+      async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy1YZcnRXoYozjOqQV0oPMuN1Rlrhfw4w&loading=async&libraries=places&callback=initMap"
+    ></script>
+  </body>
+</html>
