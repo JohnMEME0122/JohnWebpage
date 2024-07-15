@@ -4,15 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>午餐吃什麼?</title>
+    <style>
+      input,
+      button {
+        margin: 0.5vh 0;
+      }
+    </style>
   </head>
   <body style="margin: 0">
     <div style="display: flex">
       <div id="map" style="width: 50%; height: 100vh"></div>
-      <div></div>
+      <div style="padding: 1vh">
+        <input id="apiKey" placeholder="輸入你的 API 金鑰" />
+        <button id="loadMap">匯入地圖</button>
+        <br />
+        <input id="search-input" />
+      </div>
     </div>
     <script>
       let map;
       let currentPosition;
+      let selectedRestaurant;
+      let marker;
+      let directionsService;
+      let directionsRenderer;
+      let infoWindow;
 
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
@@ -28,19 +44,110 @@
 
           map.setCenter(currentPosition);
           map.setZoom(16);
+
+          const autocomplete = new google.maps.places.Autocomplete(
+            document.getElementById("search-input"),
+            {
+              types: ["restaurant"],
+              bounds: {
+                east: currentPosition.lng + 0.001,
+                west: currentPosition.lng - 0.001,
+                south: currentPosition.lat - 0.001,
+                north: currentPosition.lat + 0.001,
+              },
+              strictBounds: false,
+            }
+          );
+          autocomplete.addListener("place_changed", function () {
+            const place = autocomplete.getPlace();
+            selectedRestaurant = {
+              location: place.geometry.location,
+              placeId: place.place_id,
+              name: place.name,
+              address: place.formatted_address,
+              phoneNumber: place.formatted_phone_number,
+              rating: place.rating,
+            };
+
+            map.setCenter(selectedRestaurant.location);
+
+            if (!marker) {
+              marker = new google.maps.Marker({
+                map: map,
+              });
+            }
+
+            marker.setPosition(selectedRestaurant.location);
+
+            if (!directionsService) {
+              directionsService = new google.maps.DirectionsService();
+            }
+
+            if (!directionsRenderer) {
+              directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+              });
+            }
+
+            directionsRenderer.set("directions", null);
+            calculateAndDisplayRoute();
+          });
+
+          map.addListener("click", function (event) {
+            currentPosition = {
+              lat: event.latLng.lat(),
+              lng: event.latLng.lng(),
+            };
+            calculateAndDisplayRoute();
+          });
         });
       }
 
-      const apiKey = prompt("請輸入你的密碼");
+      function calculateAndDisplayRoute() {
+        if (selectedRestaurant) {
+          directionsService.route(
+            {
+              origin: new google.maps.LatLng(
+                currentPosition.lat,
+                currentPosition.lng
+              ),
+              destination: {
+                placeId: selectedRestaurant.placeId,
+              },
+              travelMode: "WALKING",
+            },
+            function (response, status) {
+              if (status === "OK") {
+                directionsRenderer.setDirections(response);
+                if (!infoWindow) {
+                  infoWindow = new google.maps.InfoWindow();
+                }
 
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
-      script.async = true;
-      document.body.appendChild(script);
+                infoWindow.setContent(
+                  `<h3>${selectedRestaurant.name}</h3>
+                  <div>地址：${selectedRestaurant.address}</div>
+                  <div>電話：${selectedRestaurant.phoneNumber}</div>
+                  <div>評分：${selectedRestaurant.rating}</div>
+                  <div>步行時間：${response.routes[0].legs[0].duration.text}</div>`
+                );
+                infoWindow.open(map, marker);
+              }
+            }
+          );
+        }
+      }
+
+      document.getElementById("loadMap").addEventListener("click", function () {
+        const apiKey = document.getElementById("apiKey").value;
+        if (apiKey) {
+          const script = document.createElement("script");
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap&region=TW&language=zh-TW`;
+          script.async = true;
+          document.body.appendChild(script);
+        } else {
+          alert("請輸入 API 金鑰~");
+        }
+      });
     </script>
-    <script
-      async
-      src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"
-    ></script>
   </body>
 </html>
