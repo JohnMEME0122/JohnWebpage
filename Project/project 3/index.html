@@ -4,21 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>午餐吃什麼?</title>
-    <style>
-      input,
-      button {
-        margin: 0.5vh 0;
-      }
-    </style>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
   </head>
   <body style="margin: 0">
     <div style="display: flex">
       <div id="map" style="width: 50%; height: 100vh"></div>
       <div style="padding: 1vh">
-        <input id="apiKey" placeholder="輸入你的 API 金鑰" />
-        <button id="loadMap">匯入地圖</button>
-        <br />
-        <input id="search-input" />
+        <div style="display: flex; align-items: center">
+          <input
+            id="apiKey"
+            placeholder="輸入你的 API 金鑰"
+            class="form-control"
+            style="flex: 5; margin-right: 10px"
+          />
+          <button
+            id="loadMap"
+            class="btn btn-primary"
+            style="flex: 1; white-space: nowrap"
+          >
+            匯入API
+          </button>
+        </div>
+        <h2 class="mt-5">今天午餐吃什麼？</h2>
+        <input id="search-input" class="form-control" />
+        <button class="btn btn-primary mt-2" id="add">加入我的最愛</button>
+        <h4 class="mt-5">我的最愛</h4>
+        <ul
+          class="list-group list-group-flush list-group-numbered"
+          id="restaurant-list"
+        ></ul>
       </div>
     </div>
     <script>
@@ -101,42 +120,94 @@
             calculateAndDisplayRoute();
           });
         });
-      }
 
-      function calculateAndDisplayRoute() {
-        if (selectedRestaurant) {
-          directionsService.route(
-            {
-              origin: new google.maps.LatLng(
-                currentPosition.lat,
-                currentPosition.lng
-              ),
-              destination: {
-                placeId: selectedRestaurant.placeId,
+        function calculateAndDisplayRoute() {
+          if (selectedRestaurant) {
+            directionsService.route(
+              {
+                origin: new google.maps.LatLng(
+                  currentPosition.lat,
+                  currentPosition.lng
+                ),
+                destination: {
+                  placeId: selectedRestaurant.placeId,
+                },
+                travelMode: "WALKING",
               },
-              travelMode: "WALKING",
-            },
-            function (response, status) {
-              if (status === "OK") {
-                directionsRenderer.setDirections(response);
-                if (!infoWindow) {
-                  infoWindow = new google.maps.InfoWindow();
-                }
+              function (response, status) {
+                if (status === "OK") {
+                  directionsRenderer.setDirections(response);
+                  if (!infoWindow) {
+                    infoWindow = new google.maps.InfoWindow();
+                  }
 
-                infoWindow.setContent(
-                  `<h3>${selectedRestaurant.name}</h3>
+                  infoWindow.setContent(
+                    `<h3>${selectedRestaurant.name}</h3>
                   <div>地址：${selectedRestaurant.address}</div>
                   <div>電話：${selectedRestaurant.phoneNumber}</div>
                   <div>評分：${selectedRestaurant.rating}</div>
                   <div>步行時間：${response.routes[0].legs[0].duration.text}</div>`
-                );
-                infoWindow.open(map, marker);
+                  );
+                  infoWindow.open(map, marker);
+                }
               }
-            }
-          );
+            );
+          }
         }
       }
 
+      const restaurantList =
+        JSON.parse(localStorage.getItem("restaurantList")) || [];
+      restaurantList.forEach(function (restaurant) {
+        document.getElementById("restaurant-list").innerHTML += `
+      <li class="list-group-item">
+        ${restaurant.name}
+        <button class="btn-close float-end remove"></button>
+      </li>
+    `;
+      });
+
+      document.getElementById("add").addEventListener("click", function () {
+        if (selectedRestaurant) {
+          document.getElementById("restaurant-list").innerHTML += `
+        <li class="list-group-item">
+          ${selectedRestaurant.name}
+          <button class="btn-close float-end remove"></button>
+        </li>
+      `;
+          const restaurantList =
+            JSON.parse(localStorage.getItem("restaurantList")) || [];
+          restaurantList.push(selectedRestaurant);
+          localStorage.setItem(
+            "restaurantList",
+            JSON.stringify(restaurantList)
+          );
+        }
+      });
+
+      document
+        .getElementById("restaurant-list")
+        .addEventListener("click", function (e) {
+          if (e.target.classList.contains("remove")) {
+            const restaurantName =
+              e.target.parentNode.childNodes[0].nodeValue.trim();
+            e.target.parentNode.remove();
+
+            const restaurantList =
+              JSON.parse(localStorage.getItem("restaurantList")) || [];
+            const newRestaurantList = restaurantList.filter(function (
+              restaurant
+            ) {
+              return restaurant.name !== restaurantName;
+            });
+            localStorage.setItem(
+              "restaurantList",
+              JSON.stringify(newRestaurantList)
+            );
+          }
+        });
+    </script>
+    <script>
       document.getElementById("loadMap").addEventListener("click", function () {
         const apiKey = document.getElementById("apiKey").value;
         if (apiKey) {
