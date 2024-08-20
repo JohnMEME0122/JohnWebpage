@@ -1,0 +1,172 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+ul {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}
+
+.btn {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  margin: 1rem 0.5rem;
+}
+.btn:hover {
+  cursor: pointer;
+}
+
+body {
+  background-color: #272727;
+  color: white;
+  font-family: "Baloo 2", cursive;
+}
+body section.animation-wrapper {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  background-color: white;
+}
+body section.animation-wrapper section.animation {
+  margin-top: 10vh;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+body section.animation-wrapper section.animation .hero {
+  width: 100%;
+  height: 0;
+}
+body section.animation-wrapper section.animation .hero img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+body section.animation-wrapper .slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(to right, rgb(144, 144, 144), rgb(0, 0, 0));
+  z-index: -1;
+}
+body header nav {
+  box-shadow: 0 8px 6px -6px black;
+}
+body header nav ul {
+  display: flex;
+}
+body header nav ul li {
+  padding: 1rem;
+}
+body header nav ul li a {
+  font-size: 1.15rem;
+  transition: all 0.3s ease;
+}
+body header nav ul li a:hover {
+  color: yellow;
+}
+body main section.main-part {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}
+body main section.main-part h1 {
+  font-size: 3rem;
+}
+body main section.main-part p {
+  font-size: 1.15rem;
+}
+body main section.main-part div.all-inputs form input,
+body main section.main-part div.all-inputs form select {
+  font-size: 1.05rem;
+  padding: 0.5rem;
+  border: 0.25px solid rgb(39, 39, 21);
+  margin: 0.35rem;
+  border-radius: 0.25rem;
+}
+body main section.main-part div.all-inputs form input.class-credit {
+  width: 10%;
+}
+body main section.main-part div.all-inputs form button {
+  border: none;
+  cursor: pointer;
+  background-color: #272727;
+}
+body main section.main-part div.all-inputs form button i {
+  font-size: 1.25rem;
+  pointer-events: none;
+  color: white;
+}
+body main section.main-part button.plus-btn {
+  background-color: #272727;
+  border: none;
+  width: 2.5rem;
+  margin: 3rem 0rem;
+  cursor: pointer;
+}
+body main section.main-part button.plus-btn i {
+  font-size: 2.5rem;
+  color: white;
+}
+body main section.main-part div.result {
+  width: 200px;
+  height: 200px;
+  border: 3px solid red;
+  border-radius: 50%;
+  text-align: center;
+  animation-name: border_color;
+  animation-duration: 8s;
+  animation-iteration-count: infinite;
+}
+body main section.main-part div.result p {
+  margin-top: 15px;
+}
+body main section.main-part div.result h2#result-gpa {
+  font-size: 3.5rem;
+  font-weight: bold;
+}
+
+.remove {
+  transform: scale(0);
+  transition: all 0.5s ease;
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes scaleDown {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
+}
+@keyframes boreder_color {
+  0% {
+    border-color: red;
+  }
+  33% {
+    border-color: limegreen;
+  }
+  66% {
+    border-color: yellow;
+  }
+}/*# sourceMappingURL=style.css.map */
